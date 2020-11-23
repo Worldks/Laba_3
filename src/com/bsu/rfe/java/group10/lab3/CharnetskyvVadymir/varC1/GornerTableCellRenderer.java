@@ -12,38 +12,30 @@ import javax.swing.JTable;
 import javax.swing.table.TableCellRenderer;
 
 public class GornerTableCellRenderer implements TableCellRenderer {
+
     private JPanel panel = new JPanel();
     private JLabel label = new JLabel();
-    // Ищем ячейки, строковое представление которых совпадает с needle
-// (иголкой). Применяется аналогия поиска иголки в стоге сена, в роли
-// стога сена - таблица
-    private String needle = null;
-    private DecimalFormat formatter = (DecimalFormat) NumberFormat.getInstance();
+    private String needle = null;   // Ищем ячейки, строковое представление которых совпадает с needle
+    private DecimalFormat formatter = (DecimalFormat) NumberFormat.getInstance();  // Получение числового формата и преобразование его к десятичному
 
-    public GornerTableCellRenderer() {
+    public GornerTableCellRenderer() {          // Конструктор класса
         formatter.setMaximumFractionDigits(5);  // Показывать только 5 знаков после запятой
-        formatter.setGroupingUsed(false);
+        formatter.setGroupingUsed(false);       // Т.е. показывать число как "1000", а не "1 000" или "1,000"
         DecimalFormatSymbols dottedDouble = formatter.getDecimalFormatSymbols();    // Установить в качестве разделителя дробной части точку, а не запятую.
-        dottedDouble.setDecimalSeparator('.');
+        dottedDouble.setDecimalSeparator('.');      // Т.к. по дефолту стоит запятая для России и Беларуси
         formatter.setDecimalFormatSymbols(dottedDouble);
         panel.add(label);// Разместить надпись внутри панели
         panel.setLayout(new FlowLayout(FlowLayout.LEFT));// Установить выравнивание надписи по левому краю панели
     }
 
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int col) {
-// Преобразовать double в строку с помощью форматировщика
-        String formattedDouble = formatter.format(value);
-// Установить текст надписи равным строковому представлению числа
-        label.setText(formattedDouble);
+
+        String formattedDouble = formatter.format(value);   // Преобразовать double в строку с помощью форматировщика
+        label.setText(formattedDouble); // Установить текст надписи равным строковому представлению числа
         if (col == 1 && needle != null && needle.equals(formattedDouble)) {
-// Номер столбца = 1 (т.е. второй столбец) + иголка не null
-// (значит что-то ищем) +
-// значение иголки совпадает со значением ячейки таблицы -
-// окрасить задний фон панели в красный цвет
             panel.setBackground(Color.RED);
         } else {
-// Иначе - в обычный белый
-            panel.setBackground(Color.WHITE);
+            panel.setBackground(Color.WHITE);   // Иначе - в обычный белый
         }
         return panel;
     }

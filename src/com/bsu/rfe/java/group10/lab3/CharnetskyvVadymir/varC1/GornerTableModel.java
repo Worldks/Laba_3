@@ -31,21 +31,18 @@ public class GornerTableModel extends AbstractTableModel {
     }
     @Override
     public int getRowCount() {
-        return new Double(Math.ceil((to-from)/step)).intValue()+1; // Данная функция устарела но она работает
+        return new Double(Math.ceil((to-from)/step)).intValue()+1; // Данная функция устарела но она работает(Перечеркнутый дабл)
     }
     @Override
     public Object getValueAt(int row, int col) {
-// Вычислить значение X как НАЧАЛО_ОТРЕЗКА + ШАГ*НОМЕР_СТРОКИ
-        double x = from + step*row;
+        double x = from + step*row;// Вычислить значение X как НАЧАЛО_ОТРЕЗКА + ШАГ*НОМЕР_СТРОКИ
         if (col==0) {
             return x;
         } else {
             Double result = 0.0;
-            // Вычисление значения в точке по схеме Горнера.
-            // Вспомнить 1-ый курс и реализовать
             for (int i = 0; i < coefficients.length; i++) {
                 result = result * x + coefficients[i];
-            }
+            }//схема Горнера
             return result;
         }
     }
