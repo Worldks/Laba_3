@@ -36,14 +36,27 @@ public class GornerTableModel extends AbstractTableModel {
     @Override
     public Object getValueAt(int row, int col) {
         double x = from + step*row;// Вычислить значение X как НАЧАЛО_ОТРЕЗКА + ШАГ*НОМЕР_СТРОКИ
-        if (col==0) {
-            return x;
-        } else {
-            Double result = 0.0;
-            for (int i = 0; i < coefficients.length; i++) {
-                result = result * x + coefficients[i];
-            }//схема Горнера
-            return result;
+        switch (col) {
+            case 0:
+                return x;
+            case 1:{
+                Double result = 0.0;
+                for (int i = 0; i < coefficients.length; i++) {
+                    result = result * x + coefficients[i];
+                }// схема Горнера
+                return result;
+            }
+            case 2:{
+                Double result =0.0;
+                for (int i = 0; i < coefficients.length; i++) {
+                    result+=Math.pow(x,coefficients.length-i-1)*coefficients[i];
+                }// Обычный посчёт с помощью pow()
+                return result;
+            }
+            default: {
+                //
+                return Math.abs((Double)getValueAt(row,1)-(Double)getValueAt(row,2));
+            }
         }
     }
     @Override
@@ -55,8 +68,12 @@ public class GornerTableModel extends AbstractTableModel {
         switch (col) {
             case 0:
                 return "Значение X";
-            default:
+            case 1:
                 return "Значение многочлена";
+            case 2:
+                return "С помощью Math.pow()";
+            default:
+                return "Разница между значениями";
         }
     }
 
