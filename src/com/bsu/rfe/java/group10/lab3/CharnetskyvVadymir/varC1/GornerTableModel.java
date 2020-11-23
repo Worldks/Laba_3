@@ -27,7 +27,7 @@ public class GornerTableModel extends AbstractTableModel {
 
     @Override           // переопределение
     public int getColumnCount() {
-        return 2;
+        return 4;
     }
     @Override
     public int getRowCount() {
