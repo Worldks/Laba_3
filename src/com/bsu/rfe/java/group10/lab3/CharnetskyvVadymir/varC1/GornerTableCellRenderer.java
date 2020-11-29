@@ -32,6 +32,15 @@ public class GornerTableCellRenderer implements TableCellRenderer {
 
         String formattedDouble = formatter.format(value);   // Преобразовать double в строку с помощью форматировщика
         label.setText(formattedDouble); // Установить текст надписи равным строковому представлению числа
+
+        if(Double.parseDouble(formattedDouble)<0){
+            panel.setLayout(new FlowLayout(FlowLayout.LEFT));
+        }else if((Double.parseDouble(formattedDouble)>0)){
+            panel.setLayout(new FlowLayout(FlowLayout.RIGHT));
+        }else if(Double.parseDouble(formattedDouble)==0){
+            panel.setLayout(new FlowLayout(FlowLayout.CENTER));
+        }
+
         if (col == 1 && needle != null && needle.equals(formattedDouble)) {
             panel.setBackground(Color.RED);
         } else {
