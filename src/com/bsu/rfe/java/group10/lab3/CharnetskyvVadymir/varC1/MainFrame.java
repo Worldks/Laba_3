@@ -23,6 +23,7 @@ public class MainFrame extends JFrame {
     private JMenuItem saveToGraphicsMenuItem;
     private JMenuItem searchValueMenuItem;
     private JMenuItem aboutProgramMenuItem;
+    private JMenuItem findCloseToSimpleNumbers;
 
     private JTextField textFieldFrom;
     private JTextField textFieldTo;
@@ -34,24 +35,33 @@ public class MainFrame extends JFrame {
     private GornerTableModel data;
 
     public MainFrame(Double[] coefficients) {       //Конструктор класса
-// Обязательный вызов конструктора предка
+        // Обязательный вызов конструктора предка
         super("Табулирование многочлена на отрезке по схеме Горнера");
-// Запомнить во внутреннем поле переданные коэффициенты
+        // Запомнить во внутреннем поле переданные коэффициенты
         this.coefficients = coefficients;
         setSize(WIDTH, HEIGHT);
         Toolkit kit = Toolkit.getDefaultToolkit();
         setLocation((kit.getScreenSize().width - WIDTH)/2, (kit.getScreenSize().height - HEIGHT)/2);
-// Создать меню
+        // Создать меню
         JMenuBar menuBar = new JMenuBar();
-// Установить меню в качестве главного меню приложения
+        // Установить меню в качестве главного меню приложения
         setJMenuBar(menuBar);
-// Добавить в меню пункт меню "Файл"
+        // Добавить в меню пункт меню "Файл"
         JMenu fileMenu = new JMenu("Файл");
         menuBar.add(fileMenu);
         JMenu tableMenu = new JMenu("Таблица");
         menuBar.add(tableMenu);
         JMenu Reference = new JMenu("Справка");
         menuBar.add(Reference);
+        // ----------------------------------------------------------------------------------------------------
+        Action findCloseToSimpleNumbersAction = new AbstractAction("Найти близкие к простым"){
+            public void actionPerformed(ActionEvent event) {
+                renderer.findSimple(true);
+                getContentPane().repaint();
+            }
+        };
+        findCloseToSimpleNumbers =  tableMenu.add(findCloseToSimpleNumbersAction);
+        findCloseToSimpleNumbers.setEnabled(false);
 
         Action aboutProgramAction = new AbstractAction("О программе") {
             public void actionPerformed(ActionEvent event) {
@@ -64,14 +74,14 @@ public class MainFrame extends JFrame {
         aboutProgramMenuItem = Reference.add(aboutProgramAction);
         aboutProgramMenuItem.setEnabled(true);
 
-// Создать новое "действие" по сохранению в текстовый файл
+        // Создать новое "действие" по сохранению в текстовый файл
         Action saveToTextAction = new AbstractAction("Сохранить в текстовый файл") {
         public void actionPerformed(ActionEvent event) {
             if (fileChooser==null) {
                 fileChooser = new JFileChooser();   // Если экземпляр диалогового окна "Открытьфайл" ещѐ не создан, то создать его
                 fileChooser.setCurrentDirectory(new File(".")); // и инициализировать текущей директорией
             }
-// Показать диалоговое окно
+        // Показать диалоговое окно
             if (fileChooser.showSaveDialog(MainFrame.this) == JFileChooser.APPROVE_OPTION)
                 saveToTextFile(fileChooser.getSelectedFile());  // Если результат его показа успешный, сохранить данные в текстовый файл. Данный метод приинимает аргументы типа File
         }
@@ -85,7 +95,7 @@ public class MainFrame extends JFrame {
                 fileChooser = new JFileChooser();   // Если экземпляр диалогового окна "Открыть файл" ещѐ не создан, то создать его
                 fileChooser.setCurrentDirectory(new File(".")); // и инициализировать текущей директорией
             }
-// Показать диалоговое окно
+        // Показать диалоговое окно
             if (fileChooser.showSaveDialog(MainFrame.this) == JFileChooser.APPROVE_OPTION);
                 saveToGraphicsFile(fileChooser.getSelectedFile());  // Если результат его показа успешный,сохранить данные в двоичный файл
         }
@@ -130,15 +140,15 @@ public class MainFrame extends JFrame {
         hboxRange.add(textFieldStep);
         hboxRange.add(Box.createHorizontalGlue());
 
-// Установить предпочтительный размер области равным удвоенному
-// минимальному, чтобы при компоновке область совсем не сдавили
+        // Установить предпочтительный размер области равным удвоенному
+        // минимальному, чтобы при компоновке область совсем не сдавили
         hboxRange.setPreferredSize(new Dimension(
                 new Double(hboxRange.getMaximumSize().getWidth()).intValue(),
                 new Double(hboxRange.getMinimumSize().getHeight()).intValue()*2));
 
         getContentPane().add(hboxRange, BorderLayout.NORTH);// Установить область в верхнюю (северную) часть компоновки
 
-// Создать кнопку "Вычислить"
+        // Создать кнопку "Вычислить"
         JButton buttonCalc = new JButton("Вычислить");
         buttonCalc.addActionListener(new ActionListener() {// Задать действие на нажатие "Вычислить" и привязать к кнопке
             public void actionPerformed(ActionEvent ev) {
@@ -148,7 +158,7 @@ public class MainFrame extends JFrame {
                     Double step = Double.parseDouble(textFieldStep.getText());
                     data = new GornerTableModel(from, to, step, MainFrame.this.coefficients);// На основе считанных данных создать новый экземпляр модели таблицы
                     JTable table = new JTable(data);// Создать новый экземпляр таблицы __________________(Почему он так создаётся?)
-// Установить в качестве визуализатора ячеек для класса Double разработанный визуализатор
+        // Установить в качестве визуализатора ячеек для класса Double разработанный визуализатор
                     table.setDefaultRenderer(Double.class, renderer);
                     table.setRowHeight(30);// Установить размер строки таблицы в 30 пикселов
                     hBoxResult.removeAll();// Удалить все вложенные элементы из контейнера  hBoxResult
@@ -157,6 +167,7 @@ public class MainFrame extends JFrame {
                     saveToTextMenuItem.setEnabled(true);// Пометить ряд элементов меню как доступных
                     saveToGraphicsMenuItem.setEnabled(true);
                     searchValueMenuItem.setEnabled(true);
+                    findCloseToSimpleNumbers.setEnabled(true);
                 } catch (NumberFormatException ex) {// В случае ошибки преобразования чисел показать сообщение об ошибке
                     JOptionPane.showMessageDialog(MainFrame.this,
                             "Ошибка в формате записи числа с плавающей точкой", "Ошибочный формат числа",
@@ -164,7 +175,7 @@ public class MainFrame extends JFrame {
                 }
             }
         });
-// Создать кнопку "Очистить поля"
+        // Создать кнопку "Очистить поля"
         JButton buttonReset = new JButton("Очистить поля");
         buttonReset.addActionListener(new ActionListener() {// Задать действие на нажатие "Очистить поля" и привязать к кнопке
             public void actionPerformed(ActionEvent ev) {
@@ -188,8 +199,8 @@ public class MainFrame extends JFrame {
         hboxButtons.add(buttonReset);
         hboxButtons.add(Box.createHorizontalGlue());
 
-// Установить предпочтительный размер области равным удвоенному минимальному, чтобы при
-// компоновке окна область совсем не сдавили
+        // Установить предпочтительный размер области равным удвоенному минимальному, чтобы при
+        // компоновке окна область совсем не сдавили
         hboxButtons.setPreferredSize(new Dimension(new
                 Double(hboxButtons.getMaximumSize().getWidth()).intValue(), new
                 Double(hboxButtons.getMinimumSize().getHeight()).intValue()*2));
@@ -200,26 +211,28 @@ public class MainFrame extends JFrame {
         hBoxResult.add(new JPanel());
         getContentPane().add(hBoxResult, BorderLayout.CENTER);// Установить контейнер hBoxResult в главной (центральной) области граничной компоновки
     }
+
     protected void saveToGraphicsFile(File selectedFile) {
         try {
-// Создать новый байтовый поток вывода, направленный в указанный файл
+    // Создать новый байтовый поток вывода, направленный в указанный файл
             DataOutputStream out = new DataOutputStream(new FileOutputStream(selectedFile));
-// Записать в поток вывода попарно значение X в точке, значение многочлена в точке
+    // Записать в поток вывода попарно значение X в точке, значение многочлена в точке
             for (int i = 0; i<data.getRowCount(); i++) {
                 out.writeDouble((Double)data.getValueAt(i,0));
                 out.writeDouble((Double)data.getValueAt(i,1));
             }
             out.close();// Закрыть поток вывода
         } catch (Exception e) {
-// Исключительную ситуацию "ФайлНеНайден" в данном случае можно не обрабатывать,
-// так как мы файл создаѐм, а не открываем для чтения
+    // Исключительную ситуацию "ФайлНеНайден" в данном случае можно не обрабатывать,
+    // так как мы файл создаѐм, а не открываем для чтения
         }
     }
+
     protected void saveToTextFile(File selectedFile) {
         try {
-// Создать новый символьный поток вывода, направленный в указанный файл
+    // Создать новый символьный поток вывода, направленный в указанный файл
             PrintStream out = new PrintStream(selectedFile);
-// Записать в поток вывода заголовочные сведения
+    // Записать в поток вывода заголовочные сведения
             out.println("Результаты табулирования многочлена по схеме Горнера");
                     out.print("Многочлен: ");
             for (int i=0; i<coefficients.length; i++) {
@@ -232,15 +245,15 @@ public class MainFrame extends JFrame {
             out.println("Интервал от " + data.getFrom() + " до " +
                     data.getTo() + " с шагом " + data.getStep());
             out.println("====================================================");
-// Записать в поток вывода значения в точках
+    // Записать в поток вывода значения в точках
             for (int i = 0; i<data.getRowCount(); i++) {
                 out.println("Значение в точке " + data.getValueAt(i,0)
                         + " равно " + data.getValueAt(i,1));
             }
             out.close();// Закрыть поток
         } catch (FileNotFoundException e) {
-// Исключительную ситуацию "ФайлНеНайден" можно не
-// обрабатывать, так как мы файл создаѐм, а не открываем
+    // Исключительную ситуацию "ФайлНеНайден" можно не
+    // обрабатывать, так как мы файл создаѐм, а не открываем
         }
     }
 

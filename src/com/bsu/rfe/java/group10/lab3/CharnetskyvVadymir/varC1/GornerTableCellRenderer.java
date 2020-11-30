@@ -10,6 +10,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.table.TableCellRenderer;
+import java.math.BigInteger;
 
 public class GornerTableCellRenderer implements TableCellRenderer {
 
@@ -17,6 +18,7 @@ public class GornerTableCellRenderer implements TableCellRenderer {
     private JLabel label = new JLabel();
     private String needle = null;   // Ищем ячейки, строковое представление которых совпадает с needle
     private DecimalFormat formatter = (DecimalFormat) NumberFormat.getInstance();  // Получение числового формата и преобразование его к десятичному
+    private Boolean simlpeNumbers= false;
 
     public GornerTableCellRenderer() {          // Конструктор класса
         formatter.setMaximumFractionDigits(5);  // Показывать только 5 знаков после запятой
@@ -33,11 +35,11 @@ public class GornerTableCellRenderer implements TableCellRenderer {
         String formattedDouble = formatter.format(value);   // Преобразовать double в строку с помощью форматировщика
         label.setText(formattedDouble); // Установить текст надписи равным строковому представлению числа
 
-        if(Double.parseDouble(formattedDouble)<0){
+        if(Double.parseDouble(formattedDouble) < 0){
             panel.setLayout(new FlowLayout(FlowLayout.LEFT));
-        }else if((Double.parseDouble(formattedDouble)>0)){
+        }else if((Double.parseDouble(formattedDouble) > 0)){
             panel.setLayout(new FlowLayout(FlowLayout.RIGHT));
-        }else if(Double.parseDouble(formattedDouble)==0){
+        }else if(Double.parseDouble(formattedDouble) == 0){
             panel.setLayout(new FlowLayout(FlowLayout.CENTER));
         }
 
@@ -46,10 +48,36 @@ public class GornerTableCellRenderer implements TableCellRenderer {
         } else {
             panel.setBackground(Color.WHITE);   // Иначе - в обычный белый
         }
+
+        if(simlpeNumbers){
+            final double error = 0.1;
+            double numberFromTable = Double.parseDouble(formattedDouble);
+            Integer bIntegerPart =  (int)numberFromTable;
+            Integer eIntegerPart = (int)numberFromTable+1;
+            // Если наше число отклоняеться от целой части больше чем на 0.1
+            // То это число точно не будет входить в погрешность 0.1 для целых чисел
+            if(bIntegerPart >= numberFromTable-error && bIntegerPart >= 1.9){
+                // Проверим число на простоту, выполнив тест на простоту
+                // В Java уже реализован тест Рабина-Миллера в классe BigInteger
+                BigInteger bigInteger = BigInteger.valueOf(bIntegerPart);
+                boolean simpleNumber = bigInteger.isProbablePrime((int)Math.log(bIntegerPart));
+                // Если число простое окрасим его поле в оранжевый
+                if(simpleNumber) panel.setBackground(Color.ORANGE);
+                else panel.setBackground(Color.WHITE);
+            }else if(eIntegerPart <= numberFromTable+error && eIntegerPart >= 1.9){
+                BigInteger bigInteger = BigInteger.valueOf(eIntegerPart);
+                boolean simpleNumber = bigInteger.isProbablePrime((int)Math.log(eIntegerPart));
+                if(simpleNumber) panel.setBackground(Color.ORANGE);
+                else panel.setBackground(Color.WHITE);
+            }else panel.setBackground(Color.WHITE);
+        }
+
         return panel;
     }
 
     public void setNeedle(String needle) {
         this.needle = needle;
     }
+    public void findSimple(boolean flag){ simlpeNumbers = flag; }
+
 }

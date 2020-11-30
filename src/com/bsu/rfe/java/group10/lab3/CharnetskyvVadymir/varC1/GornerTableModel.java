@@ -29,11 +29,11 @@ public class GornerTableModel extends AbstractTableModel {
     public int getColumnCount() {
         return 4;
     }
-    @Override
+
     public int getRowCount() {
         return new Double(Math.ceil((to-from)/step)).intValue()+1; // Данная функция устарела но она работает(Перечеркнутый дабл)
     }
-    @Override
+
     public Object getValueAt(int row, int col) {
         double x = from + step*row;// Вычислить значение X как НАЧАЛО_ОТРЕЗКА + ШАГ*НОМЕР_СТРОКИ
         switch (col) {
@@ -59,11 +59,11 @@ public class GornerTableModel extends AbstractTableModel {
             }
         }
     }
-    @Override
+
     public Class<?> getColumnClass(int col) {
         return Double.class;
     }
-    @Override
+
     public String getColumnName(int col) {
         switch (col) {
             case 0:
