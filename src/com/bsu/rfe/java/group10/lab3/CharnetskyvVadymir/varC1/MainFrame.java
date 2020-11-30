@@ -24,6 +24,7 @@ public class MainFrame extends JFrame {
     private JMenuItem searchValueMenuItem;
     private JMenuItem aboutProgramMenuItem;
     private JMenuItem findCloseToSimpleNumbers;
+    private JMenuItem saveToCSVMenuItem;
 
     private JTextField textFieldFrom;
     private JTextField textFieldTo;
@@ -73,6 +74,21 @@ public class MainFrame extends JFrame {
         };
         aboutProgramMenuItem = Reference.add(aboutProgramAction);
         aboutProgramMenuItem.setEnabled(true);
+
+        // Создать новое действие по сохранению в CSV формат
+        Action saveToCSVAction = new AbstractAction("Сохранить данные в формате СSV") {
+            public void actionPerformed(ActionEvent e) {
+                if(fileChooser==null){
+                    fileChooser = new JFileChooser();
+                    fileChooser.setCurrentDirectory(new File("."));
+                }
+                if(fileChooser.showSaveDialog(MainFrame.this) == JFileChooser.APPROVE_OPTION){
+                    saveToCSVFile(fileChooser.getSelectedFile());
+                }
+            }
+        };
+        saveToCSVMenuItem = fileMenu.add(saveToCSVAction);
+        saveToCSVAction.setEnabled(false);
 
         // Создать новое "действие" по сохранению в текстовый файл
         Action saveToTextAction = new AbstractAction("Сохранить в текстовый файл") {
@@ -157,9 +173,8 @@ public class MainFrame extends JFrame {
                     Double to = Double.parseDouble(textFieldTo.getText());
                     Double step = Double.parseDouble(textFieldStep.getText());
                     data = new GornerTableModel(from, to, step, MainFrame.this.coefficients);// На основе считанных данных создать новый экземпляр модели таблицы
-                    JTable table = new JTable(data);// Создать новый экземпляр таблицы __________________(Почему он так создаётся?)
-        // Установить в качестве визуализатора ячеек для класса Double разработанный визуализатор
-                    table.setDefaultRenderer(Double.class, renderer);
+                    JTable table = new JTable(data);// Создать новый экземпляр таблицы  data модель таблицы
+                    table.setDefaultRenderer(Double.class, renderer);// Установить в качестве визуализатора ячеек для класса Double разработанный визуализатор
                     table.setRowHeight(30);// Установить размер строки таблицы в 30 пикселов
                     hBoxResult.removeAll();// Удалить все вложенные элементы из контейнера  hBoxResult
                     hBoxResult.add(new JScrollPane(table));// Добавить в hBoxResult таблицу, "обѐрнутую" в панель с полосами прокрутки
@@ -168,6 +183,7 @@ public class MainFrame extends JFrame {
                     saveToGraphicsMenuItem.setEnabled(true);
                     searchValueMenuItem.setEnabled(true);
                     findCloseToSimpleNumbers.setEnabled(true);
+                    saveToCSVMenuItem.setEnabled(true);
                 } catch (NumberFormatException ex) {// В случае ошибки преобразования чисел показать сообщение об ошибке
                     JOptionPane.showMessageDialog(MainFrame.this,
                             "Ошибка в формате записи числа с плавающей точкой", "Ошибочный формат числа",
@@ -254,6 +270,40 @@ public class MainFrame extends JFrame {
         } catch (FileNotFoundException e) {
     // Исключительную ситуацию "ФайлНеНайден" можно не
     // обрабатывать, так как мы файл создаѐм, а не открываем
+        }
+    }
+
+    // Запись в формат CSV
+    // Где каждая строка файла - это одна строка таблицы.
+    // Разделителем значений колонок являеться символ запятой ","
+    // Но в руссифицированнойй версии exel разделителем являться символ ";"
+    // Так что я использую ";", т.к. у меня руссифицированный exel ;)
+    protected void  saveToCSVFile(File selectedFile){
+        try{
+            // Создать новый сивольный поток вывода, направленный в указанный файл
+            PrintStream out = new PrintStream(selectedFile);
+            // Записать в поток вывода заголовочные сведения
+            out.println("Результат табулирования значений полинма; вычисленный по Горнеру");
+            out.print("Полином:;");
+            for(int i=0;i<coefficients.length;i++){
+                out.print(coefficients[i] + "X^"+(coefficients.length-i-1));
+                if(i!=coefficients.length-1)
+                    out.print("+");
+            }
+            out.println("");
+            out.println("Интервал от  " + data.getFrom() + " до "+
+                    data.getTo() + ";с шагом " + data.getStep());
+            // Записать в поток вывода значения вточках
+            out.println("Значение X;Значение полинома");
+            for(int i=0;i<data.getRowCount();i++){
+                out.println(data.getValueAt(i,0)+
+                        ";" + data.getValueAt(i,1));
+            }
+            // Закрыть поток
+            out.close();
+        }catch (FileNotFoundException e){
+            // Исключительную ситуацию "Файл не найден" в данном случае можно
+            // не обрабатывать, так как мы файл создаём, а не открываем для чтения
         }
     }
 

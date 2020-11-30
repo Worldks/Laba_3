@@ -30,7 +30,7 @@ public class GornerTableCellRenderer implements TableCellRenderer {
         panel.setLayout(new FlowLayout(FlowLayout.LEFT));// Установить выравнивание надписи по левому краю панели
     }
 
-    public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int col) {
+    public Component getTableCellRendererComponent(JTable table/*ссылку на экземпляр таблицы, ячейка которой отображается*/, Object value/*флаг выделения ячейки*/, boolean isSelected/*флаг наличия фокуса ввода в ячейке*/, boolean hasFocus, int row, int col) {
 
         String formattedDouble = formatter.format(value);   // Преобразовать double в строку с помощью форматировщика
         label.setText(formattedDouble); // Установить текст надписи равным строковому представлению числа
@@ -78,6 +78,6 @@ public class GornerTableCellRenderer implements TableCellRenderer {
     public void setNeedle(String needle) {
         this.needle = needle;
     }
-    public void findSimple(boolean flag){ simlpeNumbers = flag; }
+    public void findSimple(boolean flag){ this.simlpeNumbers = flag; }
 
 }

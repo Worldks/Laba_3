@@ -25,7 +25,6 @@ public class GornerTableModel extends AbstractTableModel {
         return step;
     }
 
-    @Override           // переопределение
     public int getColumnCount() {
         return 4;
     }
@@ -49,8 +48,8 @@ public class GornerTableModel extends AbstractTableModel {
             case 2:{
                 Double result =0.0;
                 for (int i = 0; i < coefficients.length; i++) {
-                    result+=Math.pow(x,coefficients.length-i-1)*coefficients[i];
-                }// Обычный посчёт с помощью pow()
+                    result += Math.pow(x,coefficients.length-i-1)*coefficients[i];
+                }// Обычный подсчёт с помощью pow()
                 return result;
             }
             default: {
