@@ -43,7 +43,7 @@ public class GornerTableCellRenderer implements TableCellRenderer {
             panel.setLayout(new FlowLayout(FlowLayout.CENTER));
         }
 
-        if (col == 1 && needle != null && needle.equals(formattedDouble)) {
+        if (col == 1 && needle != null && needle.equals(formattedDouble)  || col == 2 && needle != null && needle.equals(formattedDouble)) {
             panel.setBackground(Color.RED);
         } else {
             panel.setBackground(Color.WHITE);   // Иначе - в обычный белый
