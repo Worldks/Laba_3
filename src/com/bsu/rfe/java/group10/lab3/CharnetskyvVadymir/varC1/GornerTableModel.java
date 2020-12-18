@@ -25,41 +25,54 @@ public class GornerTableModel extends AbstractTableModel {
         return step;
     }
 
-    @Override           // переопределение
     public int getColumnCount() {
-        return 2;
+        return 4;
     }
-    @Override
+
     public int getRowCount() {
-        return new Double(Math.ceil((to-from)/step)).intValue()+1; // Данная функция устарела но она работает
+        return new Double(Math.ceil((to-from)/step)).intValue()+1; // Данная функция устарела но она работает(Перечеркнутый дабл)
     }
-    @Override
+
     public Object getValueAt(int row, int col) {
-// Вычислить значение X как НАЧАЛО_ОТРЕЗКА + ШАГ*НОМЕР_СТРОКИ
-        double x = from + step*row;
-        if (col==0) {
-            return x;
-        } else {
-            Double result = 0.0;
-            // Вычисление значения в точке по схеме Горнера.
-            // Вспомнить 1-ый курс и реализовать
-            for (int i = 0; i < coefficients.length; i++) {
-                result = result * x + coefficients[i];
+        double x = from + step*row;// Вычислить значение X как НАЧАЛО_ОТРЕЗКА + ШАГ*НОМЕР_СТРОКИ
+        switch (col) {
+            case 0:
+                return x;
+            case 1:{
+                Double result = 0.0;
+                for (int i = 0; i < coefficients.length; i++) {
+                    result = result * x + coefficients[i];
+                }// схема Горнера
+                return result;
             }
-            return result;
+            case 2:{
+                Double result =0.0;
+                for (int i = 0; i < coefficients.length; i++) {
+                    result += Math.pow(x,coefficients.length-i-1)*coefficients[i];
+                }// Обычный подсчёт с помощью pow()
+                return result;
+            }
+            default: {
+                //
+                return Math.abs((Double)getValueAt(row,1)-(Double)getValueAt(row,2));
+            }
         }
     }
-    @Override
+
     public Class<?> getColumnClass(int col) {
         return Double.class;
     }
-    @Override
+
     public String getColumnName(int col) {
         switch (col) {
             case 0:
                 return "Значение X";
-            default:
+            case 1:
                 return "Значение многочлена";
+            case 2:
+                return "С помощью Math.pow()";
+            default:
+                return "Разница между значениями";
         }
     }
 
